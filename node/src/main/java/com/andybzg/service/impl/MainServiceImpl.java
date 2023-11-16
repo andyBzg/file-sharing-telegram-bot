@@ -2,12 +2,15 @@ package com.andybzg.service.impl;
 
 import com.andybzg.dao.AppUserDAO;
 import com.andybzg.dao.RawDataDAO;
+import com.andybzg.entity.AppDocument;
 import com.andybzg.entity.AppUser;
 import com.andybzg.entity.RawData;
 import com.andybzg.enums.UserState;
+import com.andybzg.exceptions.UploadFileException;
+import com.andybzg.service.FileService;
 import com.andybzg.service.MainService;
 import com.andybzg.service.ProducerService;
-import com.andybzg.service.enums.ServiceCommands;
+import com.andybzg.service.enums.ServiceCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -21,11 +24,13 @@ public class MainServiceImpl implements MainService {
     private final RawDataDAO rawDataDAO;
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
+    private final FileService fileService;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
+        this.fileService = fileService;
     }
 
     @Override
@@ -36,7 +41,8 @@ public class MainServiceImpl implements MainService {
         String text = update.getMessage().getText();
         String output = "";
 
-        if (ServiceCommands.CANCEL.equals(text)) {
+        ServiceCommand command = ServiceCommand.fromValue(text);
+        if (ServiceCommand.CANCEL.equals(command)) {
             output = cancelProcess(appUser);
         } else if (UserState.BASIC_STATE.equals(userState)) {
             output = processServiceCommand(appUser, text);
@@ -49,8 +55,6 @@ public class MainServiceImpl implements MainService {
 
         Long chatId = update.getMessage().getChatId();
         sendAnswer(output, chatId);
-
-
     }
 
     @Override
@@ -62,9 +66,16 @@ public class MainServiceImpl implements MainService {
             return;
         }
 
-        //TODO implement document saving feature
-        String answer = "Document successfully uploaded! Download link: https://test.com/get-doc/777";
-        sendAnswer(answer, chatId);
+        try {
+            AppDocument document = fileService.processDoc(update.getMessage());
+            //TODO add download link generation
+            String answer = "Document successfully uploaded! Download link: https://test.com/get-doc/777";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException ex) {
+            log.error(ex.getMessage());
+            String error = "File upload failed! Please try again";
+            sendAnswer(error, chatId);
+        }
     }
 
     @Override
@@ -103,12 +114,12 @@ public class MainServiceImpl implements MainService {
     }
 
     private String processServiceCommand(AppUser appUser, String cmd) {
-        if (ServiceCommands.REGISTRATION.equals(cmd)) {
+        if (ServiceCommand.REGISTRATION.equals(cmd)) {
             //TODO implement user registration
             return "Work in progress";
-        } else if (ServiceCommands.HELP.equals(cmd)) {
+        } else if (ServiceCommand.HELP.equals(cmd)) {
             return help();
-        } else if (ServiceCommands.START.equals(cmd)) {
+        } else if (ServiceCommand.START.equals(cmd)) {
             return "Greetings! For available commands please type /help";
         } else {
             return "Unknown command! For available commands please type /help";
