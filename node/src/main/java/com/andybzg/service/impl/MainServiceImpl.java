@@ -11,6 +11,7 @@ import com.andybzg.exceptions.UploadFileException;
 import com.andybzg.service.FileService;
 import com.andybzg.service.MainService;
 import com.andybzg.service.ProducerService;
+import com.andybzg.service.enums.LinkType;
 import com.andybzg.service.enums.ServiceCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -69,8 +70,8 @@ public class MainServiceImpl implements MainService {
 
         try {
             AppDocument document = fileService.processDoc(update.getMessage());
-            //TODO add download link generation
-            String answer = "Document successfully uploaded! Download link: https://test.com/get-doc/777";
+            String link = fileService.generateLink(document.getId(), LinkType.GET_DOC);
+            String answer = "Document successfully uploaded! Download link: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error(ex.getMessage());
@@ -90,8 +91,8 @@ public class MainServiceImpl implements MainService {
 
         try {
             AppPhoto photo = fileService.processPhoto(update.getMessage());
-            //TODO add download link generation
-            String answer = "Photo successfully uploaded! Download link: https://test.com/get-photo/777";
+            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
+            String answer = "Photo successfully uploaded! Download link: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error(ex.getMessage());

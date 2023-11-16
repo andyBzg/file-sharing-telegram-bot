@@ -1,5 +1,6 @@
 package com.andybzg.service.impl;
 
+import com.andybzg.CryptoTool;
 import com.andybzg.dao.AppDocumentDAO;
 import com.andybzg.dao.AppPhotoDAO;
 import com.andybzg.dao.BinaryContentDAO;
@@ -8,6 +9,7 @@ import com.andybzg.entity.AppPhoto;
 import com.andybzg.entity.BinaryContent;
 import com.andybzg.exceptions.UploadFileException;
 import com.andybzg.service.FileService;
+import com.andybzg.service.enums.LinkType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,21 +43,25 @@ public class FileServiceImpl implements FileService {
     private String fileInfoUri;
     @Value("${service.file_storage.uri}")
     private String fileStorageUri;
+    @Value("${link.address}")
+    private String linkAddress;
 
     private final AppDocumentDAO appDocumentDAO;
     private final AppPhotoDAO appPhotoDAO;
     private final BinaryContentDAO binaryContentDAO;
     private final ObjectMapper objectMapper;
+    private final CryptoTool cryptoTool;
 
     public FileServiceImpl(
             AppDocumentDAO appDocumentDAO,
             AppPhotoDAO appPhotoDAO,
             BinaryContentDAO binaryContentDAO,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper, CryptoTool cryptoTool) {
         this.appDocumentDAO = appDocumentDAO;
         this.appPhotoDAO = appPhotoDAO;
         this.binaryContentDAO = binaryContentDAO;
         this.objectMapper = objectMapper;
+        this.cryptoTool = cryptoTool;
     }
 
     @Override
@@ -77,7 +83,9 @@ public class FileServiceImpl implements FileService {
     @Override
     public AppPhoto processPhoto(Message telegramMessage) {
         //TODO implement multiple photo processing
-        PhotoSize telegramPhoto = telegramMessage.getPhoto().get(0);
+        int photoSizeCount = telegramMessage.getPhoto().size();
+        int photoIndex = photoSizeCount > 1 ? telegramMessage.getPhoto().size() - 1 : 0;
+        PhotoSize telegramPhoto = telegramMessage.getPhoto().get(photoIndex);
         String fileId = telegramPhoto.getFileId();
         ResponseEntity<String> response = getFilePath(fileId);
 
@@ -89,6 +97,12 @@ public class FileServiceImpl implements FileService {
         } else {
             throw new UploadFileException("Bad response from Telegram Service: " + response);
         }
+    }
+
+    @Override
+    public String generateLink(Long docId, LinkType linkType) {
+        String hash = cryptoTool.hashOf(docId);
+        return "http://" + linkAddress + "/" + linkType + "?id=" + hash;
     }
 
     private BinaryContent getPersistentBinaryContent(ResponseEntity<String> response) {
