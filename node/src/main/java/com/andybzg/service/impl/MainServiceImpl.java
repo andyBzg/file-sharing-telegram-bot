@@ -3,6 +3,7 @@ package com.andybzg.service.impl;
 import com.andybzg.dao.AppUserDAO;
 import com.andybzg.dao.RawDataDAO;
 import com.andybzg.entity.AppDocument;
+import com.andybzg.entity.AppPhoto;
 import com.andybzg.entity.AppUser;
 import com.andybzg.entity.RawData;
 import com.andybzg.enums.UserState;
@@ -87,9 +88,17 @@ public class MainServiceImpl implements MainService {
             return;
         }
 
-        //TODO implement photo saving feature
-        String answer = "Photo successfully uploaded! Download link: https://test.com/get-photo/777";
-        sendAnswer(answer, chatId);
+        try {
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
+            //TODO add download link generation
+            String answer = "Photo successfully uploaded! Download link: https://test.com/get-photo/777";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException ex) {
+            log.error(ex.getMessage());
+            String error = "File upload failed! Please try again";
+            sendAnswer(error, chatId);
+        }
+
     }
 
     private boolean isNotAllowedToSendContent(Long chatId, AppUser appUser) {
