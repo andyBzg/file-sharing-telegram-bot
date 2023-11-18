@@ -8,6 +8,7 @@ import com.andybzg.entity.AppUser;
 import com.andybzg.entity.RawData;
 import com.andybzg.enums.UserState;
 import com.andybzg.exceptions.UploadFileException;
+import com.andybzg.service.AppUserService;
 import com.andybzg.service.FileService;
 import com.andybzg.service.MainService;
 import com.andybzg.service.ProducerService;
@@ -19,6 +20,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class MainServiceImpl implements MainService {
@@ -27,12 +30,19 @@ public class MainServiceImpl implements MainService {
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
     private final FileService fileService;
+    private final AppUserService appUserService;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService) {
+    public MainServiceImpl(
+            RawDataDAO rawDataDAO,
+            ProducerService producerService,
+            AppUserDAO appUserDAO,
+            FileService fileService,
+            AppUserService appUserService) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
         this.fileService = fileService;
+        this.appUserService = appUserService;
     }
 
     @Override
@@ -49,7 +59,7 @@ public class MainServiceImpl implements MainService {
         } else if (UserState.BASIC_STATE.equals(userState)) {
             output = processServiceCommand(appUser, text);
         } else if (UserState.WAIT_FOR_EMAIL_STATE.equals(userState)) {
-            //TODO implement email processing
+            output = appUserService.setEmail(appUser, text);
         } else {
             log.error("Unknown user state: " + userState);
             output = "Unknown error! Enter /cancel and try again";
@@ -125,8 +135,7 @@ public class MainServiceImpl implements MainService {
 
     private String processServiceCommand(AppUser appUser, String cmd) {
         if (ServiceCommand.REGISTRATION.equals(cmd)) {
-            //TODO implement user registration
-            return "Work in progress";
+            return appUserService.registerUser(appUser);
         } else if (ServiceCommand.HELP.equals(cmd)) {
             return help();
         } else if (ServiceCommand.START.equals(cmd)) {
@@ -150,21 +159,20 @@ public class MainServiceImpl implements MainService {
 
     private AppUser findOrSaveAppUser(Update update) {
         User telegramUser = update.getMessage().getFrom();
+        Optional<AppUser> persistentAppUser = appUserDAO.findByTelegramUserId(telegramUser.getId());
 
-        AppUser persistentAppUser = appUserDAO.findAppUserByTelegramUserId(telegramUser.getId());
-        if (persistentAppUser == null) {
+        if (persistentAppUser.isEmpty()) {
             AppUser transientAppUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
                     .username(telegramUser.getUserName())
                     .firstName(telegramUser.getFirstName())
                     .lastname(telegramUser.getLastName())
-                    //TODO change default user state after implementing registration feature
-                    .isActive(true)
+                    .isActive(false)
                     .state(UserState.BASIC_STATE)
                     .build();
             return appUserDAO.save(transientAppUser);
         }
-        return persistentAppUser;
+        return persistentAppUser.get();
     }
 
     private void saveRawData(Update update) {

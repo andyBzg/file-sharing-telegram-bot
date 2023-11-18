@@ -1,4 +1,4 @@
-package com.andybzg;
+package com.andybzg.utils;
 
 import org.hashids.Hashids;
 

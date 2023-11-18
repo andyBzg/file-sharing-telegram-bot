@@ -1,6 +1,6 @@
 package com.andybzg.service.impl;
 
-import com.andybzg.CryptoTool;
+import com.andybzg.utils.CryptoTool;
 import com.andybzg.dao.AppDocumentDAO;
 import com.andybzg.dao.AppPhotoDAO;
 import com.andybzg.entity.AppDocument;
