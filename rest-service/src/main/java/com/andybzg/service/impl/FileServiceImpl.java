@@ -6,22 +6,18 @@ import com.andybzg.dao.AppPhotoDAO;
 import com.andybzg.entity.AppDocument;
 import com.andybzg.entity.AppPhoto;
 import com.andybzg.service.FileService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Service
 @Slf4j
+@RequiredArgsConstructor
+@Service
 public class FileServiceImpl implements FileService {
 
     private final AppDocumentDAO appDocumentDAO;
     private final AppPhotoDAO appPhotoDAO;
     private final CryptoTool cryptoTool;
-
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, CryptoTool cryptoTool) {
-        this.appDocumentDAO = appDocumentDAO;
-        this.appPhotoDAO = appPhotoDAO;
-        this.cryptoTool = cryptoTool;
-    }
 
     @Override
     public AppDocument getDocument(String hash) {
