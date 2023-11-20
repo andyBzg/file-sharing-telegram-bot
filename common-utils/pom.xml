@@ -9,6 +9,8 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <packaging>jar</packaging>
+
     <artifactId>common-utils</artifactId>
 
     <properties>
@@ -24,5 +26,17 @@
             <version>1.0.3</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

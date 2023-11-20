@@ -19,8 +19,8 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "app_photo")
+@Entity
 public class AppPhoto {
 
     @Id
