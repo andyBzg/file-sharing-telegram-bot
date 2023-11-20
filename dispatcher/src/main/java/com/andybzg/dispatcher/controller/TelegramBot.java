@@ -2,6 +2,7 @@ package com.andybzg.dispatcher.controller;
 
 import com.andybzg.dispatcher.config.BotConfig;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
@@ -11,17 +12,13 @@ import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-@Component
 @Slf4j
+@RequiredArgsConstructor
+@Component
 public class TelegramBot extends TelegramWebhookBot {
 
     private final BotConfig botConfig;
     private final UpdateProcessor updateProcessor;
-
-    public TelegramBot(BotConfig botConfig, UpdateProcessor updateProcessor) {
-        this.botConfig = botConfig;
-        this.updateProcessor = updateProcessor;
-    }
 
     @PostConstruct
     public void init() {

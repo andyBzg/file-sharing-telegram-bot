@@ -24,8 +24,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "app_user")
+@Entity
 public class AppUser {
 
     @Id

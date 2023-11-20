@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-@Configuration
 @PropertySource(value = "classpath:security.properties")
+@Configuration
 public class NodeConfig {
 
     @Value("${salt}")

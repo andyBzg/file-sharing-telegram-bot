@@ -2,14 +2,16 @@ package com.andybzg.service.impl;
 
 import com.andybzg.dto.MailParams;
 import com.andybzg.service.MailSenderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-@Service
+@RequiredArgsConstructor
 @PropertySource("classpath:email.properties")
+@Service
 public class MailSenderServiceImpl implements MailSenderService {
 
     @Value("${spring.mail.username}")
@@ -19,10 +21,6 @@ public class MailSenderServiceImpl implements MailSenderService {
     private String activationServiceUri;
 
     private final JavaMailSender javaMailSender;
-
-    public MailSenderServiceImpl(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-    }
 
     @Override
     public void send(MailParams mailParams) {

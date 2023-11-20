@@ -6,6 +6,7 @@ import com.andybzg.entity.BinaryContent;
 import com.andybzg.service.FileService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,16 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-@RestController
-@RequestMapping("/file")
 @Slf4j
+@RequiredArgsConstructor
+@RequestMapping("/file")
+@RestController
 public class FileController {
 
     private final FileService fileService;
-
-    public FileController(FileService fileService) {
-        this.fileService = fileService;
-    }
 
     @GetMapping("/get-doc")
     public void getDoc(@RequestParam("id") String id, HttpServletResponse response) {

@@ -1,18 +1,19 @@
 package com.andybzg.service.impl;
 
-import com.andybzg.utils.CryptoTool;
 import com.andybzg.dao.AppDocumentDAO;
 import com.andybzg.dao.AppPhotoDAO;
 import com.andybzg.dao.BinaryContentDAO;
 import com.andybzg.entity.AppDocument;
 import com.andybzg.entity.AppPhoto;
 import com.andybzg.entity.BinaryContent;
+import com.andybzg.utils.CryptoTool;
 import com.andybzg.exceptions.UploadFileException;
 import com.andybzg.service.FileService;
 import com.andybzg.service.enums.LinkType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -32,9 +33,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-@Service
-@PropertySource(value = "classpath:telegram-api.properties")
 @Slf4j
+@RequiredArgsConstructor
+@PropertySource(value = "classpath:telegram-api.properties")
+@Service
 public class FileServiceImpl implements FileService {
 
     @Value("${bot.token}")
@@ -51,18 +53,6 @@ public class FileServiceImpl implements FileService {
     private final BinaryContentDAO binaryContentDAO;
     private final ObjectMapper objectMapper;
     private final CryptoTool cryptoTool;
-
-    public FileServiceImpl(
-            AppDocumentDAO appDocumentDAO,
-            AppPhotoDAO appPhotoDAO,
-            BinaryContentDAO binaryContentDAO,
-            ObjectMapper objectMapper, CryptoTool cryptoTool) {
-        this.appDocumentDAO = appDocumentDAO;
-        this.appPhotoDAO = appPhotoDAO;
-        this.binaryContentDAO = binaryContentDAO;
-        this.objectMapper = objectMapper;
-        this.cryptoTool = cryptoTool;
-    }
 
     @Override
     public AppDocument processDoc(Message telegramMessage) {
@@ -156,10 +146,10 @@ public class FileServiceImpl implements FileService {
         }
 
         //TODO optimization needed
-        try(InputStream inputStream = urlObj.openStream()) {
+        try (InputStream inputStream = urlObj.openStream()) {
             return inputStream.readAllBytes();
         } catch (IOException e) {
-            throw new UploadFileException(urlObj.toExternalForm() ,e);
+            throw new UploadFileException(urlObj.toExternalForm(), e);
         }
     }
 

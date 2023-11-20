@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-@Configuration
-@PropertySource(value = "classpath:bot.properties")
 @Data
+@PropertySource(value = "classpath:bot.properties")
+@Configuration
 public class BotConfig {
 
     @Value("${bot.name}")
@@ -19,4 +19,3 @@ public class BotConfig {
     @Value("${bot.uri}")
     private String botUri;
 }
-

@@ -19,8 +19,8 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "app_document")
+@Entity
 public class AppDocument {
 
     @Id

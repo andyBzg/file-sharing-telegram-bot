@@ -6,6 +6,7 @@ import com.andybzg.entity.AppUser;
 import com.andybzg.enums.UserState;
 import com.andybzg.service.AppUserService;
 import com.andybzg.utils.CryptoTool;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -21,8 +22,9 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.util.Optional;
 
-@Service
 @Slf4j
+@RequiredArgsConstructor
+@Service
 public class AppUserServiceImpl implements AppUserService {
 
     @Value("${service.mail.uri}")
@@ -30,11 +32,6 @@ public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserDAO appUserDAO;
     private final CryptoTool cryptoTool;
-
-    public AppUserServiceImpl(AppUserDAO appUserDAO, CryptoTool cryptoTool) {
-        this.appUserDAO = appUserDAO;
-        this.cryptoTool = cryptoTool;
-    }
 
     @Override
     public String registerUser(AppUser appUser) {
