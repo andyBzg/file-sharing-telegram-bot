@@ -15,5 +15,8 @@ public class BotConfig {
 
     @Value("${bot.token}")
     private String botToken;
+
+    @Value("${bot.uri}")
+    private String botUri;
 }
 

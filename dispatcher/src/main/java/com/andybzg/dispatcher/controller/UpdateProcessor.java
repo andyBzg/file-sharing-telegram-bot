@@ -14,13 +14,13 @@ import static com.andybzg.model.RabbitQueue.TEXT_MESSAGE_UPDATE;
 
 @Component
 @Slf4j
-public class UpdateController {
+public class UpdateProcessor {
 
     private TelegramBot telegramBot;
     private final MessageUtils messageUtils;
     private final UpdateProducer updateProducer;
 
-    public UpdateController(MessageUtils messageUtils, UpdateProducer updateProducer) {
+    public UpdateProcessor(MessageUtils messageUtils, UpdateProducer updateProducer) {
         this.messageUtils = messageUtils;
         this.updateProducer = updateProducer;
     }
