@@ -20,11 +20,6 @@
     <dependencies>
         <dependency>
             <groupId>com.andybzg</groupId>
-            <artifactId>common-rabbitmq</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.andybzg</groupId>
             <artifactId>common-jpa</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

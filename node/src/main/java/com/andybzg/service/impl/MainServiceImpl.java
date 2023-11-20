@@ -14,6 +14,7 @@ import com.andybzg.service.MainService;
 import com.andybzg.service.ProducerService;
 import com.andybzg.service.enums.LinkType;
 import com.andybzg.service.enums.ServiceCommand;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -22,8 +23,9 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.Optional;
 
-@Service
 @Slf4j
+@RequiredArgsConstructor
+@Service
 public class MainServiceImpl implements MainService {
 
     private final RawDataDAO rawDataDAO;
@@ -32,26 +34,13 @@ public class MainServiceImpl implements MainService {
     private final FileService fileService;
     private final AppUserService appUserService;
 
-    public MainServiceImpl(
-            RawDataDAO rawDataDAO,
-            ProducerService producerService,
-            AppUserDAO appUserDAO,
-            FileService fileService,
-            AppUserService appUserService) {
-        this.rawDataDAO = rawDataDAO;
-        this.producerService = producerService;
-        this.appUserDAO = appUserDAO;
-        this.fileService = fileService;
-        this.appUserService = appUserService;
-    }
-
     @Override
     public void processTextMessage(Update update) {
         saveRawData(update);
         AppUser appUser = findOrSaveAppUser(update);
         UserState userState = appUser.getState();
         String text = update.getMessage().getText();
-        String output = "";
+        String output;
 
         ServiceCommand command = ServiceCommand.fromValue(text);
         if (ServiceCommand.CANCEL.equals(command)) {

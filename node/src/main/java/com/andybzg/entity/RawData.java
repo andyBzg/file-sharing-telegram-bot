@@ -24,8 +24,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "raw_data")
+@Entity
 public class RawData {
 
     @Id
