@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.11.0-management
+    hostname: rabbitmq
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/docker/volumes/rabbitmq_data/_data
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15.2-alpine
+    hostname: postgres
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: userok
+      POSTGRES_PASSWORD: p@ssw0rd
+      POSTGRES_DB: bot_db
+    volumes:
+      - /data:/c/temp
+    restart: unless-stopped
+
+volumes:
+  rabbitmq_data:
