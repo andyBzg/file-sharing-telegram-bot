@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.11.0-management
+    hostname: rabbitmq
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: userok
+      RABBITMQ_DEFAULT_PASS: p@ssw0rd
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/data
+    networks:
+      - bot-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15.2-alpine
+    hostname: postgres
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: userok
+      POSTGRES_PASSWORD: p@ssw0rd
+      POSTGRES_DB: bot_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bot-network
+    restart: unless-stopped
+
+  dispatcher:
+    build:
+      context: ./dispatcher
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+    networks:
+      - bot-network
+    ports:
+      - "8084:8084"
+
+  node:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - bot-network
+    ports:
+      - "8085:8085"
+
+  rest-service:
+    build:
+      context: ./rest-service
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    networks:
+      - bot-network
+    ports:
+      - "8086:8086"
+
+  mail-service:
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    networks:
+      - bot-network
+    ports:
+      - "8087:8087"
+
+networks:
+  bot-network:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  postgres_data:
