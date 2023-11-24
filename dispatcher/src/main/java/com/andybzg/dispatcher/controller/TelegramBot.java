@@ -1,14 +1,12 @@
 package com.andybzg.dispatcher.controller;
 
 import com.andybzg.dispatcher.config.BotConfig;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -18,20 +16,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class TelegramBot extends TelegramWebhookBot {
 
     private final BotConfig botConfig;
-    private final UpdateProcessor updateProcessor;
-
-    @PostConstruct
-    public void init() {
-        updateProcessor.registerBot(this);
-        try {
-            SetWebhook setWebhook = SetWebhook.builder()
-                    .url(botConfig.getBotUri())
-                    .build();
-            this.setWebhook(setWebhook);
-        } catch (TelegramApiException ex) {
-            log.error(ex.getMessage());
-        }
-    }
 
     @Override
     public String getBotUsername() {
@@ -41,6 +25,10 @@ public class TelegramBot extends TelegramWebhookBot {
     @Override
     public String getBotToken() {
         return botConfig.getBotToken();
+    }
+
+    public String getBotUri() {
+        return botConfig.getBotUri();
     }
 
     @Override

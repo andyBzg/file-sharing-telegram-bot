@@ -1,7 +1,7 @@
 package com.andybzg.dispatcher.service.impl;
 
-import com.andybzg.dispatcher.controller.UpdateProcessor;
 import com.andybzg.dispatcher.service.AnswerConsumer;
+import com.andybzg.dispatcher.service.UpdateProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
