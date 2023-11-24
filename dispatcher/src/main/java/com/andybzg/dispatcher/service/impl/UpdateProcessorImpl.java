@@ -1,29 +1,26 @@
-package com.andybzg.dispatcher.controller;
+package com.andybzg.dispatcher.service.impl;
 
 import com.andybzg.dispatcher.config.RabbitMqConfig;
+import com.andybzg.dispatcher.controller.TelegramBot;
+import com.andybzg.dispatcher.service.UpdateProcessor;
 import com.andybzg.dispatcher.service.UpdateProducer;
 import com.andybzg.dispatcher.utils.MessageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
-public class UpdateProcessor {
+@Service
+public class UpdateProcessorImpl implements UpdateProcessor {
 
-    private TelegramBot telegramBot;
-
+    private final TelegramBot telegramBot;
     private final MessageUtils messageUtils;
     private final UpdateProducer updateProducer;
     private final RabbitMqConfig rabbitMqConfig;
-
-    public void registerBot(TelegramBot telegramBot) {
-        this.telegramBot = telegramBot;
-    }
 
     public void processUpdate(Update update) {
         if (update == null) {
