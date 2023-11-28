@@ -44,10 +44,10 @@ class UserActivationServiceImplTest {
         when(appUserDAO.findById(id)).thenReturn(Optional.of(appUser));
 
         // when
-        boolean expected = userActivationService.activation(cryptoUserId);
+        boolean actual = userActivationService.activation(cryptoUserId);
 
         // then
-        assertTrue(expected);
+        assertTrue(actual);
         verify(cryptoTool, times(1)).idOf(cryptoUserId);
         verify(appUserDAO, times(1)).findById(id);
         verify(appUserDAO, times(1)).save(appUserCaptor.capture());
@@ -64,10 +64,10 @@ class UserActivationServiceImplTest {
         when(appUserDAO.findById(id)).thenReturn(Optional.empty());
 
         // when
-        boolean expected = userActivationService.activation(cryptoUserId);
+        boolean actual = userActivationService.activation(cryptoUserId);
 
         // then
-        assertFalse(expected);
+        assertFalse(actual);
         verify(cryptoTool, times(1)).idOf(cryptoUserId);
         verify(appUserDAO, times(1)).findById(id);
         verifyNoMoreInteractions(appUserDAO);

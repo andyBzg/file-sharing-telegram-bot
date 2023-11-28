@@ -48,14 +48,14 @@ class FileServiceImplTest {
         when(appDocumentDAO.findById(id)).thenReturn(Optional.of(appDocument));
 
         // when
-        AppDocument expected = fileService.getDocument(hash);
+        AppDocument actual = fileService.getDocument(hash);
 
         // then
         verify(cryptoTool, times(1)).idOf(hash);
         verify(appDocumentDAO, times(1)).findById(id);
-        assertNotNull(expected);
-        assertEquals(expected, appDocument);
-        assertEquals(expected.getId(), id);
+        assertNotNull(actual);
+        assertEquals(appDocument, actual);
+        assertEquals(id, actual.getId());
     }
 
     @Test
@@ -85,14 +85,14 @@ class FileServiceImplTest {
         when(appPhotoDAO.findById(id)).thenReturn(Optional.of(appPhoto));
 
         // when
-        AppPhoto expected = fileService.getPhoto(hash);
+        AppPhoto actual = fileService.getPhoto(hash);
 
         // then
         verify(cryptoTool, times(1)).idOf(hash);
         verify(appPhotoDAO, times(1)).findById(id);
-        assertNotNull(expected);
-        assertEquals(expected.getId(), id);
-        assertEquals(expected, appPhoto);
+        assertNotNull(actual);
+        assertEquals(id, actual.getId());
+        assertEquals(appPhoto, actual);
     }
 
     @Test
