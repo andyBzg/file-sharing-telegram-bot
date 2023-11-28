@@ -16,7 +16,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -53,6 +55,7 @@ public class FileServiceImpl implements FileService {
     private final BinaryContentDAO binaryContentDAO;
     private final ObjectMapper objectMapper;
     private final CryptoTool cryptoTool;
+    private final MessageSource messageSource;
 
     @Override
     public AppDocument processDoc(Message telegramMessage) {
@@ -66,7 +69,9 @@ public class FileServiceImpl implements FileService {
             AppDocument transientAppDoc = buildTransientAppDoc(telegramDoc, persistentBinaryContent);
             return appDocumentDAO.save(transientAppDoc);
         } else {
-            throw new UploadFileException("Bad response from Telegram Service: " + response);
+            String msg = messageSource.getMessage(
+                    "exception.upload.bad-response", new Object[]{response}, LocaleContextHolder.getLocale());
+            throw new UploadFileException(msg);
         }
     }
 
@@ -85,7 +90,9 @@ public class FileServiceImpl implements FileService {
             AppPhoto transientAppPhoto = buildTransientAppPhoto(telegramPhoto, persistentBinaryContent);
             return appPhotoDAO.save(transientAppPhoto);
         } else {
-            throw new UploadFileException("Bad response from Telegram Service: " + response);
+            String msg = messageSource.getMessage(
+                    "exception.upload.bad-response", new Object[]{response}, LocaleContextHolder.getLocale());
+            throw new UploadFileException(msg);
         }
     }
 
@@ -112,7 +119,9 @@ public class FileServiceImpl implements FileService {
                     .path("file_path")
                     .asText();
         } catch (JsonProcessingException e) {
-            throw new UploadFileException("Failed to process JSON response", e);
+            String msg = messageSource.getMessage(
+                    "exception.upload.failed-to-process", null, LocaleContextHolder.getLocale());
+            throw new UploadFileException(msg, e);
         }
     }
 

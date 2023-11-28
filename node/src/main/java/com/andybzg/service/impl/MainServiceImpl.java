@@ -16,6 +16,8 @@ import com.andybzg.service.enums.LinkType;
 import com.andybzg.service.enums.ServiceCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -33,6 +35,7 @@ public class MainServiceImpl implements MainService {
     private final AppUserDAO appUserDAO;
     private final FileService fileService;
     private final AppUserService appUserService;
+    private final MessageSource messageSource;
 
     @Override
     public void processTextMessage(Update update) {
@@ -50,8 +53,9 @@ public class MainServiceImpl implements MainService {
         } else if (UserState.WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser, text);
         } else {
-            log.error("Unknown user state: " + userState);
-            output = "Unknown error! Enter /cancel and try again";
+            log.error(messageSource.getMessage(
+                    "log.unknown.state", new Object[]{userState}, LocaleContextHolder.getLocale()));
+            output = messageSource.getMessage("error.msg.unknown", null, LocaleContextHolder.getLocale());
         }
 
         Long chatId = update.getMessage().getChatId();
@@ -70,11 +74,12 @@ public class MainServiceImpl implements MainService {
         try {
             AppDocument document = fileService.processDoc(update.getMessage());
             String link = fileService.generateLink(document.getId(), LinkType.GET_DOC);
-            String answer = "Document successfully uploaded! Download link: " + link;
+            String answer = messageSource.getMessage(
+                    "doc.upload.success", new Object[]{link}, LocaleContextHolder.getLocale());
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error(ex.getMessage());
-            String error = "File upload failed! Please try again";
+            String error = messageSource.getMessage("file.upload.failure", null, LocaleContextHolder.getLocale());
             sendAnswer(error, chatId);
         }
     }
@@ -91,11 +96,12 @@ public class MainServiceImpl implements MainService {
         try {
             AppPhoto photo = fileService.processPhoto(update.getMessage());
             String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
-            String answer = "Photo successfully uploaded! Download link: " + link;
+            String answer = messageSource.getMessage(
+                    "photo.upload.success", new Object[]{link}, LocaleContextHolder.getLocale());
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error(ex.getMessage());
-            String error = "File upload failed! Please try again";
+            String error = messageSource.getMessage("file.upload.failure", null, LocaleContextHolder.getLocale());
             sendAnswer(error, chatId);
         }
 
@@ -104,11 +110,13 @@ public class MainServiceImpl implements MainService {
     private boolean isNotAllowedToSendContent(Long chatId, AppUser appUser) {
         UserState userState = appUser.getState();
         if (!appUser.isActive()) {
-            String error = "Please register or activate your account to upload content!";
+            String error = messageSource.getMessage(
+                    "error.msg.not-registered", null, LocaleContextHolder.getLocale());
             sendAnswer(error, chatId);
             return true;
         } else if (!UserState.BASIC_STATE.equals(userState)) {
-            String error = "Please /cancel current command to upload content.";
+            String error = messageSource.getMessage(
+                    "error.msg.not-allowed-to-upload", null, LocaleContextHolder.getLocale());
             sendAnswer(error, chatId);
             return true;
         }
@@ -128,22 +136,20 @@ public class MainServiceImpl implements MainService {
         } else if (ServiceCommand.HELP.equals(cmd)) {
             return help();
         } else if (ServiceCommand.START.equals(cmd)) {
-            return "Greetings! For available commands please type /help";
+            return messageSource.getMessage("command.response.start", null, LocaleContextHolder.getLocale());
         } else {
-            return "Unknown command! For available commands please type /help";
+            return messageSource.getMessage("command.response.unknown", null, LocaleContextHolder.getLocale());
         }
     }
 
     private String help() {
-        return "Available commands: \n" +
-                "/cancel - Cancels the current command\n" +
-                "/registration - User registration";
+        return messageSource.getMessage("command.response.help", null, LocaleContextHolder.getLocale());
     }
 
     private String cancelProcess(AppUser appUser) {
         appUser.setState(UserState.BASIC_STATE);
         appUserDAO.save(appUser);
-        return "Command canceled!";
+        return messageSource.getMessage("command.response.cancel", null, LocaleContextHolder.getLocale());
     }
 
     private AppUser findOrSaveAppUser(Update update) {
