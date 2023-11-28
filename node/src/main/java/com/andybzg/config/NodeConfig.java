@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-@PropertySource(value = "classpath:security.properties")
+@PropertySource(value = {"classpath:security.properties", "classpath:messages.properties"})
 @Configuration
 public class NodeConfig {
 

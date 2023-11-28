@@ -4,11 +4,14 @@ import com.andybzg.dao.AppUserDAO;
 import com.andybzg.dto.MailParams;
 import com.andybzg.entity.AppUser;
 import com.andybzg.enums.UserState;
+import com.andybzg.exceptions.InvalidEmailException;
 import com.andybzg.service.AppUserService;
 import com.andybzg.utils.CryptoTool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -32,62 +35,82 @@ public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserDAO appUserDAO;
     private final CryptoTool cryptoTool;
+    private final MessageSource messageSource;
 
     @Override
     public String registerUser(AppUser appUser) {
         if (appUser.isActive()) {
-            return "You are already registered!";
+            return messageSource.getMessage("activation.already.registered", null, LocaleContextHolder.getLocale());
         } else if (appUser.getEmail() != null) {
-            return "Activation email has been already sent. Please check your inbox";
+            return messageSource.getMessage("activation.email.sent", null, LocaleContextHolder.getLocale());
         }
         appUser.setState(UserState.WAIT_FOR_EMAIL_STATE);
         appUserDAO.save(appUser);
-        return "Please enter email";
+        return messageSource.getMessage("registration.wait.email", null, LocaleContextHolder.getLocale());
     }
 
     @Override
     public String setEmail(AppUser appUser, String email) {
         try {
-            InternetAddress emailAddress = new InternetAddress(email);
-            emailAddress.validate();
-        } catch (AddressException ex) {
-            return "Please enter correct email. Type /cancel to exit";
-        }
+            validateEmail(email);
 
-        Optional<AppUser> optional = appUserDAO.findByEmail(email);
-        if (optional.isEmpty()) {
-            appUser.setEmail(email);
-            appUser.setState(UserState.BASIC_STATE);
-            appUser = appUserDAO.save(appUser);
-
-            String cryptoUserId = cryptoTool.hashOf(appUser.getId());
-            ResponseEntity<String> response = sendRequestToMailService(cryptoUserId, email);
-            if (response.getStatusCode() != HttpStatus.OK) {
-                String message = String.format("Unable to send email to %s,", email);
-                log.error(message);
-                appUser.setEmail(null);
-                appUserDAO.save(appUser);
-                return message;
+            Optional<AppUser> optional = appUserDAO.findByEmail(email);
+            if (optional.isEmpty()) {
+                return processNewEmail(appUser, email);
+            } else {
+                return messageSource.getMessage("email.used", null, LocaleContextHolder.getLocale());
             }
-            return "Activation link has been sent to your email. Please check your inbox";
-        } else {
-            return "This email is already used. Please enter correct email. Type /cancel to exit";
+        } catch (InvalidEmailException ex) {
+            return messageSource.getMessage("email.invalid", null, LocaleContextHolder.getLocale());
         }
     }
 
-    private ResponseEntity<String> sendRequestToMailService(String cryptoUserId, String email) {
+    private void validateEmail(String email) {
+        try {
+            InternetAddress emailAddress = new InternetAddress(email);
+            emailAddress.validate();
+        } catch (AddressException ex) {
+            String errorMsg = messageSource.getMessage(
+                    "exception.invalid.email", null, LocaleContextHolder.getLocale());
+            throw new InvalidEmailException(errorMsg, ex);
+        }
+    }
+
+    private String processNewEmail(AppUser appUser, String email) {
+        appUser.setEmail(email);
+        appUser.setState(UserState.BASIC_STATE);
+        appUser = appUserDAO.save(appUser);
+
+        String cryptoUserId = cryptoTool.hashOf(appUser.getId());
+        MailParams mailParams = new MailParams(cryptoUserId, email);
+
+        ResponseEntity<String> response = sendRequestToMailService(mailParams);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return messageSource.getMessage("email.activation.sent", null, LocaleContextHolder.getLocale());
+        } else {
+            handleFailedEmailSending(appUser, email);
+            return messageSource.getMessage("email.send.error", null, LocaleContextHolder.getLocale());
+        }
+    }
+
+    private ResponseEntity<String> sendRequestToMailService(MailParams mailParams) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        MailParams mailParams = new MailParams(
-                cryptoUserId,
-                email
-        );
         HttpEntity<MailParams> request = new HttpEntity<>(mailParams, headers);
+
         return restTemplate.exchange(
                 mailServiceUri,
                 HttpMethod.POST,
                 request,
                 String.class);
+    }
+
+    private void handleFailedEmailSending(AppUser appUser, String email) {
+        log.error(messageSource.getMessage(
+                "log.unable-to-send", new Object[]{email}, LocaleContextHolder.getLocale()));
+        appUser.setEmail(null);
+        appUserDAO.save(appUser);
     }
 }

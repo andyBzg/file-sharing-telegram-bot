@@ -35,16 +35,10 @@ public class FileController {
 
         response.setContentType(String.valueOf(MediaType.parseMediaType(document.getMimeType())));
         response.setHeader("Content-disposition", "attachment; filename=" + document.getDocName());
-        response.setStatus(HttpServletResponse.SC_OK);
 
         BinaryContent binaryContent = document.getBinaryContent();
 
-        try (ServletOutputStream outputStream = response.getOutputStream()) {
-            outputStream.write(binaryContent.getFileAsArrayOfBytes());
-        } catch (IOException ex) {
-            log.error(ex.getMessage());
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
+        createHttpServletResponse(response, binaryContent);
     }
 
     @GetMapping("/get-photo")
@@ -58,12 +52,16 @@ public class FileController {
 
         response.setContentType(MediaType.IMAGE_JPEG.toString());
         response.setHeader("Content-disposition", "attachment;");
-        response.setStatus(HttpServletResponse.SC_OK);
 
         BinaryContent binaryContent = photo.getBinaryContent();
 
+        createHttpServletResponse(response, binaryContent);
+    }
+
+    private void createHttpServletResponse(HttpServletResponse response, BinaryContent binaryContent) {
         try (ServletOutputStream outputStream = response.getOutputStream()) {
             outputStream.write(binaryContent.getFileAsArrayOfBytes());
+            response.setStatus(HttpServletResponse.SC_OK);
         } catch (IOException ex) {
             log.error(ex.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
