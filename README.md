@@ -26,30 +26,36 @@ To install and run the File Sharing Telegram Bot, follow these steps:
 1. Clone the repository to your local machine:
    ```bash
    git clone https://github.com/andyBzg/file-sharing-telegram-bot.git
+   ```
    
 2. Obtain your Telegram Bot Username and Token by following these instructions: https://core.telegram.org/bots/features#creating-a-new-bot
-3. Download Ngrok and register to get Authtoken https://ngrok.com/
+3. Download Ngrok and register to get Authtoken: https://ngrok.com/
 4. Run Ngrok and enter these commands:
    ```
    ngrok config add-authtoken [your token]
    ngrok http 8084
-
-5. Copy Forwarding address from Ngrok console
    ```
-   https:// ... .ngrok-free.app 
 
-6. Set up your dispatcher/resources/application.properties:
+5. Copy the Forwarding address from Ngrok console. Example:
+   ```
+   https://b71e-2001-9e8-33de-600-c55b-727c-2af1-a07c.ngrok-free.app 
+   ```
+
+6. Set up your `dispatcher/resources/application.properties` by adding these properties:
    ```
    bot.name=[bot username]
    bot.token=[bot token]
    bot.uri=[forwarding uri]
+   ```
    
-7. Also copy bot token property to node/resources/application.properties
+7. Also, copy bot token property to `node/resources/application.properties`
    
 8. Using Terminal run these commands:
    ```
    mvn install
    docker compose up
+   ```
+**Note**: Make sure you have Docker installed on your machine before running the above commands.
 
 ## Usage
 
