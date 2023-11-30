@@ -44,7 +44,9 @@ To install and run the File Sharing Telegram Bot, follow these steps:
    bot.token=[bot token]
    bot.uri=[forwarding uri]
    
-7. Using Terminal run these commands:
+7. Also copy bot token property to node/resources/application.properties
+   
+8. Using Terminal run these commands:
    ```
    mvn install
    docker compose up
