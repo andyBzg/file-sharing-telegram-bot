@@ -1,13 +1,13 @@
 # File Sharing Telegram Bot
 
-File Sharing Telegram Bot is a Java-based Telegram bot that allows users to send various types of content, 
-such as images, photos, and documents, and receive a permanent link to download the uploaded file. 
-The bot is built using Spring Boot and follows a microservices architecture.
+This Telegram bot simplifies file sharing on Telegram by providing users with a convenient way to
+upload and download files while generating persistent download links.
 
 ## Description
 
-This Telegram bot simplifies file sharing on Telegram by providing users with a convenient way to 
-upload and download files while generating persistent download links.
+File Sharing Telegram Bot is a Java-based Telegram bot that allows users to send various types of content,
+such as images, photos, and documents, and receive a permanent link to download the uploaded file.
+The bot is built using Spring Boot and follows a microservices architecture.
 
 ## Table of Contents
 
@@ -27,7 +27,27 @@ To install and run the File Sharing Telegram Bot, follow these steps:
    ```bash
    git clone https://github.com/andyBzg/file-sharing-telegram-bot.git
    
-2. ... coming soon
+2. Obtain your Telegram Bot Username and Token by following these instructions: https://core.telegram.org/bots/features#creating-a-new-bot
+3. Download Ngrok and register to get Authtoken https://ngrok.com/
+4. Run Ngrok and enter these commands:
+   ```
+   ngrok config add-authtoken [your token]
+   ngrok http 8084
+
+5. Copy Forwarding address from Ngrok console
+   ```
+   https:// ... .ngrok-free.app 
+
+6. Set up your dispatcher/resources/application.properties:
+   ```
+   bot.name=[bot username]
+   bot.token=[bot token]
+   bot.uri=[forwarding uri]
+   
+7. Using Terminal run these commands:
+   ```
+   mvn install
+   docker compose up
 
 ## Usage
 
