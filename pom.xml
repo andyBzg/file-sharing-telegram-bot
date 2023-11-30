@@ -16,8 +16,12 @@
     <description>microservice-telegram-bot</description>
 
     <modules>
+        <module>common-jpa</module>
+        <module>common-utils</module>
         <module>dispatcher</module>
-        <module>common-rabbitmq</module>
+        <module>node</module>
+        <module>rest-service</module>
+        <module>mail-service</module>
     </modules>
 
     <properties>
@@ -30,6 +34,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-docker-compose</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
@@ -37,6 +47,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
