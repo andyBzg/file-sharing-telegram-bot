@@ -82,7 +82,7 @@ The File Sharing Telegram Bot is developed using the following technologies and 
 * PostgreSQL
 * RabbitMQ
 * Hibernate
-* Junit5 and Mockito
+* JUnit5 and Mockito
 * Maven
 
 ## Contributing
@@ -120,3 +120,5 @@ understanding of project changes.
 > feat: Add file upload functionality
 
 ## License
+
+This project is licensed under the [MIT License](LICENSE).
